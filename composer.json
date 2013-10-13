@@ -1,5 +1,5 @@
 {
-    "name": "qcubed/plugins/QTimePicker",
+    "name": "qcubed/plugins/QTimepicker",
     "description": "QCubed wrapper for the jquery.ui.timepicker.js jQuery plugin.",
     "type": "library",
     "keywords": ["qcubed", "time", "timepicker"],
