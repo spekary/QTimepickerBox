@@ -3,9 +3,11 @@
 	/**
 	*
 	* Wrapper for the QTickpickerBase class. This is the glue between the jQuery widget
-	* and QCubed.
+	* and QCubed. Formatting is based on the current jQuery UI theme.
 	*/
 	
+	namespace QCubed\Plugins;
+
 	class QTimepickerBox extends QTimepickerBase {
 
 		// MISC
@@ -51,12 +53,12 @@
 		}
 
 		public function SetStartEndHours($intStart, $intEnd) {
-			$a = array ('start'=>$intStart, 'end'=>$intEnd);
+			$a = array ('starts'=>$intStart, 'ends'=>$intEnd);
 			$this->mixHoursArray = $a;
 		}
 		
 		public function SetStartEndIntervalMinutes($intStart, $intEnd, $intInterval) {
-			$a = array ('start'=>$intStart, 'end'=>$intEnd, 'interval'=>$intInterval);
+			$a = array ('starts'=>$intStart, 'ends'=>$intEnd, 'interval'=>$intInterval);
 			$this->mixMinutesArray = $a;
 		}
 

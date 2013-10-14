@@ -23,10 +23,10 @@
 	* @property string $MyPosition Corner of the dialog to position, used with the jQuery UI Position utility if present.
 	* @property string $AtPosition Corner of the input to position
 	* @property string $AtPosition Corner of the input to position
-	* @property array $Hours Custom hours. Keys: 
+	* @property array $HoursArray Custom hours. Keys: 
 	* 	 starts:0		 number to start with 
 	* 	 ends:23 		 number to end with
-	* @property array $Minutes Custom minutes. Keys: 
+	* @property array $MinutesArray Custom minutes. Keys: 
 	*	 starts: 0,                 First displayed minute
 	*   ends: 55,                  Last displayed minute
 	*   interval: 5                Interval of displayed minutes
@@ -40,7 +40,9 @@
 	* @property bool $ShowDeselectButton Shows the deselect time button
 	* @property string $DeselectButton Text for the deselect button
 	*/
-
+	namespace QCubed\Plugins;
+	use \QTextBox, \QType, \JavascriptHelper;
+	
 	class QTimepickerBase extends QTextBox	{
 		/** @var boolean */
 		protected $blnDisabled = null;
@@ -103,11 +105,10 @@
 		
 		public function __construct($objParentObject, $strDefaultAreaCode = null, $strControlId = null) {
 			parent::__construct($objParentObject, $strControlId);
-		
+			
+			$this->AddCssFile(__JQUERY_CSS__); // make sure they know 
 			$this->AddPluginJavascriptFile("QTimepicker", "jquery.ui.timepicker.js");
-			$this->AddPluginScriptFile("QTimepicker", "jquery-ui-timepicker.css");
-		
-			$this->strDefaultAreaCode = $strDefaultAreaCode;
+			$this->AddPluginCssFile("QTimepicker", "jquery.ui.timepicker.css");
 		}
 		
 		protected function makeJsProperty($strProp, $strKey) {
@@ -130,14 +131,14 @@
 			$strJqOptions .= $this->makeJsProperty('PeriodSeparator', 'periodSeparator');
 			$strJqOptions .= $this->makeJsProperty('AltField', 'altField');
 			$strJqOptions .= $this->makeJsProperty('DefaultTime', 'defaultTime'); 
-			$strJqOptions .= $this->makeJsProperty('showOn', 'showOn'); 
+			$strJqOptions .= $this->makeJsProperty('ShowOn', 'showOn'); 
 			$strJqOptions .= $this->makeJsProperty('HourText', 'hourText');
 			$strJqOptions .= $this->makeJsProperty('MinuteText', 'minuteText');
 			$strJqOptions .= $this->makeJsProperty('AmPmText', 'amPmText');
 			$strJqOptions .= $this->makeJsProperty('MyPosition', 'myPosition');
 			$strJqOptions .= $this->makeJsProperty('AtPosition', 'atPosition');
-			$strJqOptions .= $this->makeJsProperty('Hours', 'hours');
-			$strJqOptions .= $this->makeJsProperty('Minutes', 'minutes');
+			$strJqOptions .= $this->makeJsProperty('HoursArray', 'hours');
+			$strJqOptions .= $this->makeJsProperty('MinutesArray', 'minutes');
 			$strJqOptions .= $this->makeJsProperty('Rows', 'rows');
 			$strJqOptions .= $this->makeJsProperty('ShowHours', 'showHours');
 			$strJqOptions .= $this->makeJsProperty('ShowMinutes', 'showMinutes');
@@ -278,7 +279,7 @@
 		public function __get($strName) {
 			switch ($strName) {
 				case 'Disabled': return $this->blnDisabled;
-				case 'Button': return $this->strButtonText;
+				case 'Button': return $this->strButton;
 				case 'TimeSeperator': return $this->strTimeSeperator;
 				case 'ShowPeriod': return $this->blnShowPeriod;
 				case 'ShowPeriodLabels': return $this->blnShowPeriodLabels;
@@ -293,8 +294,8 @@
 				case 'AmPmText': return $this->strAmPmText;
 				case 'MyPosition': return $this->strMyPosition;
 				case 'AtPosition': return $this->strAtPosition;
-				case 'Hours': return $this->mixHoursArray;
-				case 'Minutes': return $this->mixMinutesArray;
+				case 'HoursArray': return $this->mixHoursArray;
+				case 'MinutesArray': return $this->mixMinutesArray;
 				case 'Rows': return $this->intRows;
 				case 'ShowHours': return $this->blnShowHours;
 				case 'ShowMinutes': return $this->blnShowMinutes;
@@ -329,7 +330,7 @@
 					
 				case 'Button':
 					try {
-						$this->strButtonText = QType::Cast($mixValue, QType::String);
+						$this->strButton = QType::Cast($mixValue, QType::String);
 						break;
 					} catch (QInvalidCastException $objExc) {
 						$objExc->IncrementOffset();
@@ -459,18 +460,18 @@
 						throw $objExc;
 					}
 
-				case 'Hours': 
+				case 'HoursArray': 
 					try {
-						$this->mixHoursArray = QType::Cast($mixValue, QType::Array);
+						$this->mixHoursArray = QType::Cast($mixValue, QType::ArrayType);
 						break;
 					} catch (QInvalidCastException $objExc) {
 						$objExc->IncrementOffset();
 						throw $objExc;
 					}
 
-				case 'Minutes': 
+				case 'MinutesArray': 
 					try {
-						$this->mixMinutesArray = QType::Cast($mixValue, QType::Array);
+						$this->mixMinutesArray = QType::Cast($mixValue, QType::ArrayType);
 						break;
 					} catch (QInvalidCastException $objExc) {
 						$objExc->IncrementOffset();
@@ -488,7 +489,7 @@
 
 				case 'ShowHours': 
 					try {
-						$this->blnShowHours; = QType::Cast($mixValue, QType::Boolean);
+						$this->blnShowHours = QType::Cast($mixValue, QType::Boolean);
 						break;
 					} catch (QInvalidCastException $objExc) {
 						$objExc->IncrementOffset();
@@ -497,7 +498,7 @@
 
 				case 'ShowMinutes': 
 					try {
-						$this->blnShowMinutes; = QType::Cast($mixValue, QType::Boolean);
+						$this->blnShowMinutes = QType::Cast($mixValue, QType::Boolean);
 						break;
 					} catch (QInvalidCastException $objExc) {
 						$objExc->IncrementOffset();
@@ -506,7 +507,7 @@
 
 				case 'ShowCloseButton': 
 					try {
-						$this->blnShowCloseButton; = QType::Cast($mixValue, QType::Boolean);
+						$this->blnShowCloseButton = QType::Cast($mixValue, QType::Boolean);
 						break;
 					} catch (QInvalidCastException $objExc) {
 						$objExc->IncrementOffset();
@@ -515,7 +516,7 @@
 
 				case 'CloseButtonText': 
 					try {
-						$this->strCloseButtonText; = QType::Cast($mixValue, QType::String);
+						$this->strCloseButtonText = QType::Cast($mixValue, QType::String);
 						break;
 					} catch (QInvalidCastException $objExc) {
 						$objExc->IncrementOffset();
@@ -524,7 +525,7 @@
 
 				case 'ShowNowButton': 
 					try {
-						$this->blnShowNowButton; = QType::Cast($mixValue, QType::Boolean);
+						$this->blnShowNowButton = QType::Cast($mixValue, QType::Boolean);
 						break;
 					} catch (QInvalidCastException $objExc) {
 						$objExc->IncrementOffset();
@@ -533,7 +534,7 @@
 
 				case 'NowButtonText': 
 					try {
-						$this->strNowButtonText; = QType::Cast($mixValue, QType::String);
+						$this->strNowButtonText = QType::Cast($mixValue, QType::String);
 						break;
 					} catch (QInvalidCastException $objExc) {
 						$objExc->IncrementOffset();
@@ -542,7 +543,7 @@
 
 				case 'ShowDeselectButton': 
 					try {
-						$this->blnShowDeselectButton; = QType::Cast($mixValue, QType::Boolean);
+						$this->blnShowDeselectButton = QType::Cast($mixValue, QType::Boolean);
 						break;
 					} catch (QInvalidCastException $objExc) {
 						$objExc->IncrementOffset();
@@ -551,7 +552,7 @@
 
 				case 'DeselectButtonText': 
 					try {
-						$this->strDeselectButtonText; = QType::Cast($mixValue, QType::String);
+						$this->strDeselectButtonText = QType::Cast($mixValue, QType::String);
 						break;
 					} catch (QInvalidCastException $objExc) {
 						$objExc->IncrementOffset();

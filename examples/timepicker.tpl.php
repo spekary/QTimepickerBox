@@ -8,11 +8,13 @@
 		quickly pick times for a time field. Highly customizable to let your users quickly choose
 		times, but also type in custom times if desired. See
 		<a href="http://fgelinas.com/code/timepicker/" target="_blank">Timepicker Home Page</a>
-		for a complete description and examples of usage.
+		for a complete description and examples of usage. The styling of the control is a combination
+		of options you set, and whatever jQuery UI style you are using.
 		
 	</div>
 
-	<p>Timepicker: <?php $this->txtTimepicker->Render(); ?></p>
+	<p>Default: <?php $this->txtTimepicker1->Render(); ?></p>
+	<p>US Hours 15-min: <?php $this->txtTimepicker2->Render(); ?></p>
 			
 	<?php $this->RenderEnd(); ?>
 <?php require(__DOCROOT__ . __EXAMPLES__ . '/includes/footer.inc.php'); ?>
